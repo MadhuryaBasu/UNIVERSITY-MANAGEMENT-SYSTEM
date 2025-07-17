@@ -1,0 +1,881 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>University Management System</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 50%, #4facfe 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="20" cy="20" r="2" fill="%23ffffff10"/><circle cx="80" cy="40" r="1.5" fill="%23ffffff08"/><circle cx="40" cy="80" r="1" fill="%23ffffff12"/><circle cx="90" cy="90" r="2.5" fill="%23ffffff06"/><circle cx="10" cy="60" r="1.8" fill="%23ffffff10"/></svg>') repeat;
+            z-index: -1;
+            animation: float 20s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(25px);
+            border-radius: 25px;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(255, 255, 255, 0.2);
+            padding: 45px;
+            width: 100%;
+            max-width: 900px;
+            animation: slideIn 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(40px) scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 45px;
+            position: relative;
+        }
+
+        .header::after {
+            content: '';
+            position: absolute;
+            bottom: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 3px;
+            background: linear-gradient(90deg, #ff6b6b, #feca57, #48dbfb);
+            border-radius: 2px;
+        }
+
+        .header h1 {
+            font-size: 2.8rem;
+            font-weight: 800;
+            margin-bottom: 12px;
+            background: linear-gradient(135deg, #2c3e50, #34495e, #1abc9c);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: -0.5px;
+        }
+
+        .header p {
+            color: #64748b;
+            font-size: 1.2rem;
+            font-weight: 400;
+        }
+
+        .menu {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 25px;
+            margin-bottom: 35px;
+        }
+
+        .menu-btn {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%);
+            color: white;
+            border: none;
+            padding: 18px 25px;
+            border-radius: 16px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 8px 25px rgba(255, 107, 107, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .menu-btn:nth-child(2) {
+            background: linear-gradient(135deg, #feca57 0%, #ff9ff3 100%);
+            box-shadow: 0 8px 25px rgba(254, 202, 87, 0.3);
+        }
+
+        .menu-btn:nth-child(3) {
+            background: linear-gradient(135deg, #48dbfb 0%, #0abde3 100%);
+            box-shadow: 0 8px 25px rgba(72, 219, 251, 0.3);
+        }
+
+        .menu-btn:nth-child(4) {
+            background: linear-gradient(135deg, #1dd1a1 0%, #10ac84 100%);
+            box-shadow: 0 8px 25px rgba(29, 209, 161, 0.3);
+        }
+
+        .menu-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .menu-btn:hover::before {
+            left: 100%;
+        }
+
+        .menu-btn:hover {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+        }
+
+        .menu-btn:active {
+            transform: translateY(-1px) scale(0.98);
+        }
+
+        .content {
+            min-height: 350px;
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            border-radius: 20px;
+            padding: 35px;
+            margin-top: 25px;
+            border: 1px solid rgba(226, 232, 240, 0.8);
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.06);
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 10px;
+            color: #2d3748;
+            font-weight: 600;
+            font-size: 1rem;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 15px 18px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            background: white;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #48dbfb;
+            box-shadow: 0 0 0 4px rgba(72, 219, 251, 0.15);
+            transform: translateY(-1px);
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%);
+            color: white;
+            border: none;
+            padding: 15px 35px;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            margin-right: 15px;
+            box-shadow: 0 6px 20px rgba(255, 107, 107, 0.3);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(255, 107, 107, 0.4);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #74b9ff 0%, #0984e3 100%);
+            box-shadow: 0 6px 20px rgba(116, 185, 255, 0.3);
+        }
+
+        .btn-secondary:hover {
+            box-shadow: 0 10px 25px rgba(116, 185, 255, 0.4);
+        }
+
+        .student-card {
+            background: white;
+            border-radius: 16px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            border-left: 5px solid #ff6b6b;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .student-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(135deg, rgba(255, 107, 107, 0.1), rgba(72, 219, 251, 0.1));
+            border-radius: 50%;
+            transform: translate(30px, -30px);
+        }
+
+        .student-card:nth-child(even) {
+            border-left-color: #48dbfb;
+        }
+
+        .student-card:nth-child(3n) {
+            border-left-color: #1dd1a1;
+        }
+
+        .student-card:hover {
+            transform: translateX(8px) translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+        }
+
+        .student-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .info-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .info-label {
+            font-size: 0.95rem;
+            color: #64748b;
+            font-weight: 600;
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .info-value {
+            font-size: 1.1rem;
+            color: #1a202c;
+            font-weight: 700;
+        }
+
+        .welcome-screen {
+            text-align: center;
+            padding: 80px 30px;
+        }
+
+        .welcome-screen h2 {
+            color: #2d3748;
+            font-size: 2.4rem;
+            margin-bottom: 25px;
+            font-weight: 700;
+        }
+
+        .welcome-screen p {
+            color: #64748b;
+            font-size: 1.2rem;
+            line-height: 1.7;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .alert {
+            padding: 18px 25px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            font-weight: 600;
+            font-size: 1rem;
+            border: 1px solid;
+        }
+
+        .alert-success {
+            background: linear-gradient(135deg, #d4edda, #c3e6cb);
+            color: #155724;
+            border-color: #1dd1a1;
+        }
+
+        .alert-error {
+            background: linear-gradient(135deg, #f8d7da, #f5c6cb);
+            color: #721c24;
+            border-color: #ff6b6b;
+        }
+
+        .alert-info {
+            background: linear-gradient(135deg, #d1ecf1, #bee5eb);
+            color: #0c5460;
+            border-color: #48dbfb;
+        }
+
+        .search-results {
+            max-height: 450px;
+            overflow-y: auto;
+            padding-right: 10px;
+        }
+
+        .search-results::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .search-results::-webkit-scrollbar-track {
+            background: #f1f5f9;
+            border-radius: 4px;
+        }
+
+        .search-results::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, #ff6b6b, #48dbfb);
+            border-radius: 4px;
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 60px;
+            color: #64748b;
+        }
+
+        .no-results h3 {
+            font-size: 1.8rem;
+            margin-bottom: 15px;
+            color: #2d3748;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 25px;
+            margin-bottom: 35px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 25px;
+            border-radius: 16px;
+            text-align: center;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+            border-top: 4px solid;
+            transition: transform 0.3s ease;
+        }
+
+        .stat-card:first-child {
+            border-top-color: #ff6b6b;
+        }
+
+        .stat-card:last-child {
+            border-top-color: #48dbfb;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #ff6b6b, #48dbfb);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 8px;
+        }
+
+        .stat-label {
+            color: #64748b;
+            font-size: 1rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 25px;
+                margin: 15px;
+            }
+
+            .header h1 {
+                font-size: 2.2rem;
+            }
+
+            .menu {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+
+            .student-info {
+                grid-template-columns: 1fr;
+            }
+
+            .welcome-screen {
+                padding: 50px 20px;
+            }
+
+            .welcome-screen h2 {
+                font-size: 2rem;
+            }
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 30px;
+            color: #64748b;
+        }
+
+        .spinner {
+            border: 4px solid #f1f5f9;
+            border-top: 4px solid #ff6b6b;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Floating animation for background elements */
+        .floating-shapes {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .shape {
+            position: absolute;
+            opacity: 0.1;
+            animation: floatShapes 15s ease-in-out infinite;
+        }
+
+        .shape:nth-child(1) {
+            top: 20%;
+            left: 10%;
+            width: 60px;
+            height: 60px;
+            background: #ff6b6b;
+            border-radius: 50%;
+            animation-delay: 0s;
+        }
+
+        .shape:nth-child(2) {
+            top: 60%;
+            right: 15%;
+            width: 40px;
+            height: 40px;
+            background: #48dbfb;
+            border-radius: 50%;
+            animation-delay: 5s;
+        }
+
+        .shape:nth-child(3) {
+            bottom: 30%;
+            left: 20%;
+            width: 50px;
+            height: 50px;
+            background: #1dd1a1;
+            border-radius: 50%;
+            animation-delay: 10s;
+        }
+
+        @keyframes floatShapes {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            33% { transform: translateY(-20px) rotate(120deg); }
+            66% { transform: translateY(10px) rotate(240deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="floating-shapes">
+        <div class="shape"></div>
+        <div class="shape"></div>
+        <div class="shape"></div>
+    </div>
+
+    <div class="container">
+        <div class="header">
+            <h1>University Management System</h1>
+            <p>Manage student records with style and efficiency</p>
+        </div>
+
+        <div class="stats" id="stats">
+            <div class="stat-card">
+                <div class="stat-number" id="totalStudents">0</div>
+                <div class="stat-label">Total Students</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="totalSubjects">0</div>
+                <div class="stat-label">Subjects</div>
+            </div>
+        </div>
+
+        <div class="menu">
+            <button class="menu-btn" onclick="showAddStudent()">
+                📝 Add Student
+            </button>
+            <button class="menu-btn" onclick="showSearchStudent()">
+                🔍 Search Student
+            </button>
+            <button class="menu-btn" onclick="showUpdateStudent()">
+                ✏️ Update Student
+            </button>
+            <button class="menu-btn" onclick="showAllStudents()">
+                👥 View All Students
+            </button>
+        </div>
+
+        <div class="content" id="content">
+            <div class="welcome-screen">
+                <h2>Welcome to University Management System</h2>
+                <p>Select an option from the menu above to get started. You can add new students, search for existing records, update student information, or view all students in the system with our modern and intuitive interface.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // University Management System Class
+        class UniversitySystem {
+            constructor() {
+                this.students = this.loadStudents();
+                this.updateStats();
+            }
+
+            // Load students from localStorage
+            loadStudents() {
+                const stored = localStorage.getItem('universityStudents');
+                return stored ? JSON.parse(stored) : [];
+            }
+
+            // Save students to localStorage
+            saveStudents() {
+                localStorage.setItem('universityStudents', JSON.stringify(this.students));
+                this.updateStats();
+            }
+
+            // Add a new student
+            addStudent(rollNo, name, subject, address) {
+                // Check if student already exists
+                if (this.students.find(s => s.rollNo === rollNo)) {
+                    return { success: false, message: 'Student with this Roll Number already exists!' };
+                }
+
+                const student = {
+                    rollNo: rollNo.trim(),
+                    name: name.trim(),
+                    subject: subject.trim(),
+                    address: address.trim(),
+                    dateAdded: new Date().toISOString()
+                };
+
+                this.students.push(student);
+                this.saveStudents();
+                return { success: true, message: 'Student added successfully!' };
+            }
+
+            // Search for a student by roll number
+            searchStudent(rollNo) {
+                return this.students.filter(student => 
+                    student.rollNo.toLowerCase().includes(rollNo.toLowerCase())
+                );
+            }
+
+            // Update student address
+            updateStudent(rollNo, newAddress) {
+                const studentIndex = this.students.findIndex(s => s.rollNo === rollNo);
+                if (studentIndex === -1) {
+                    return { success: false, message: 'Student not found!' };
+                }
+
+                this.students[studentIndex].address = newAddress.trim();
+                this.students[studentIndex].lastUpdated = new Date().toISOString();
+                this.saveStudents();
+                return { success: true, message: 'Student data updated successfully!' };
+            }
+
+            // Get all students
+            getAllStudents() {
+                return this.students;
+            }
+
+            // Update statistics
+            updateStats() {
+                const totalStudents = this.students.length;
+                const subjects = [...new Set(this.students.map(s => s.subject))];
+                
+                document.getElementById('totalStudents').textContent = totalStudents;
+                document.getElementById('totalSubjects').textContent = subjects.length;
+            }
+
+            // Delete student (bonus feature)
+            deleteStudent(rollNo) {
+                const initialLength = this.students.length;
+                this.students = this.students.filter(s => s.rollNo !== rollNo);
+                
+                if (this.students.length < initialLength) {
+                    this.saveStudents();
+                    return { success: true, message: 'Student deleted successfully!' };
+                }
+                return { success: false, message: 'Student not found!' };
+            }
+        }
+
+        // Initialize the system
+        const university = new UniversitySystem();
+
+        // UI Functions
+        function showAlert(message, type = 'info') {
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type}`;
+            alertDiv.textContent = message;
+            
+            const content = document.getElementById('content');
+            content.insertBefore(alertDiv, content.firstChild);
+            
+            setTimeout(() => {
+                alertDiv.remove();
+            }, 5000);
+        }
+
+        function clearContent() {
+            document.getElementById('content').innerHTML = '';
+        }
+
+        function showAddStudent() {
+            clearContent();
+            document.getElementById('content').innerHTML = `
+                <h2 style="margin-bottom: 35px; color: #2d3748; font-weight: 700;">Add New Student</h2>
+                <form onsubmit="addStudent(event)">
+                    <div class="form-group">
+                        <label for="rollNo">Roll Number *</label>
+                        <input type="text" id="rollNo" required placeholder="Enter student roll number">
+                    </div>
+                    <div class="form-group">
+                        <label for="name">Student Name *</label>
+                        <input type="text" id="name" required placeholder="Enter student full name">
+                    </div>
+                    <div class="form-group">
+                        <label for="subject">Subject *</label>
+                        <input type="text" id="subject" required placeholder="Enter subject/course">
+                    </div>
+                    <div class="form-group">
+                        <label for="address">Address *</label>
+                        <input type="text" id="address" required placeholder="Enter student address">
+                    </div>
+                    <button type="submit" class="btn">Add Student</button>
+                    <button type="button" class="btn btn-secondary" onclick="clearForm()">Clear Form</button>
+                </form>
+            `;
+        }
+
+        function addStudent(event) {
+            event.preventDefault();
+            
+            const rollNo = document.getElementById('rollNo').value;
+            const name = document.getElementById('name').value;
+            const subject = document.getElementById('subject').value;
+            const address = document.getElementById('address').value;
+
+            const result = university.addStudent(rollNo, name, subject, address);
+            
+            if (result.success) {
+                showAlert(result.message, 'success');
+                clearForm();
+            } else {
+                showAlert(result.message, 'error');
+            }
+        }
+
+        function clearForm() {
+            document.getElementById('rollNo').value = '';
+            document.getElementById('name').value = '';
+            document.getElementById('subject').value = '';
+            document.getElementById('address').value = '';
+        }
+
+        function showSearchStudent() {
+            clearContent();
+            document.getElementById('content').innerHTML = `
+                <h2 style="margin-bottom: 35px; color: #2d3748; font-weight: 700;">Search Student</h2>
+                <div class="form-group">
+                    <label for="searchRollNo">Enter Roll Number</label>
+                    <input type="text" id="searchRollNo" placeholder="Enter roll number to search">
+                </div>
+                <button class="btn" onclick="searchStudent()">Search</button>
+                <div id="searchResults" class="search-results" style="margin-top: 35px;"></div>
+            `;
+        }
+
+        function searchStudent() {
+            const rollNo = document.getElementById('searchRollNo').value.trim();
+            const resultsDiv = document.getElementById('searchResults');
+            
+            if (!rollNo) {
+                showAlert('Please enter a roll number to search', 'error');
+                return;
+            }
+
+            const results = university.searchStudent(rollNo);
+            
+            if (results.length === 0) {
+                resultsDiv.innerHTML = `
+                    <div class="no-results">
+                        <h3>No students found</h3>
+                        <p>No student found with roll number containing "${rollNo}"</p>
+                    </div>
+                `;
+            } else {
+                resultsDiv.innerHTML = `
+                    <h3 style="margin-bottom: 25px; color: #2d3748; font-weight: 700;">Search Results (${results.length} found)</h3>
+                    ${results.map(student => createStudentCard(student)).join('')}
+                `;
+            }
+        }
+
+        function showUpdateStudent() {
+            clearContent();
+            document.getElementById('content').innerHTML = `
+                <h2 style="margin-bottom: 35px; color: #2d3748; font-weight: 700;">Update Student Address</h2>
+                <div class="form-group">
+                    <label for="updateRollNo">Roll Number *</label>
+                    <input type="text" id="updateRollNo" required placeholder="Enter roll number">
+                </div>
+                <div class="form-group">
+                    <label for="newAddress">New Address *</label>
+                    <input type="text" id="newAddress" required placeholder="Enter new address">
+                </div>
+                <button class="btn" onclick="updateStudent()">Update Address</button>
+            `;
+        }
+
+        function updateStudent() {
+            const rollNo = document.getElementById('updateRollNo').value.trim();
+            const newAddress = document.getElementById('newAddress').value.trim();
+
+            if (!rollNo || !newAddress) {
+                showAlert('Please fill in all fields', 'error');
+                return;
+            }
+
+            const result = university.updateStudent(rollNo, newAddress);
+            
+            if (result.success) {
+                showAlert(result.message, 'success');
+                document.getElementById('updateRollNo').value = '';
+                document.getElementById('newAddress').value = '';
+            } else {
+                showAlert(result.message, 'error');
+            }
+        }
+
+        function showAllStudents() {
+            clearContent();
+            const students = university.getAllStudents();
+            
+            if (students.length === 0) {
+                document.getElementById('content').innerHTML = `
+                    <div class="no-results">
+                        <h2>No Students Found</h2>
+                        <p>No students have been added to the system yet. Click "Add Student" to get started.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            document.getElementById('content').innerHTML = `
+                <h2 style="margin-bottom: 35px; color: #2d3748; font-weight: 700;">All Students (${students.length})</h2>
+                <div class="search-results">
+                    ${students.map(student => createStudentCard(student, true)).join('')}
+                </div>
+            `;
+        }
+
+        function createStudentCard(student, showDelete = false) {
+            return `
+                <div class="student-card">
+                    <div class="student-info">
+                        <div class="info-item">
+                            <div class="info-label">Roll Number</div>
+                            <div class="info-value">${student.rollNo}</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Name</div>
+                            <div class="info-value">${student.name}</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Subject</div>
+                            <div class="info-value">${student.subject}</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Address</div>
+                            <div class="info-value">${student.address}</div>
+                        </div>
+                    </div>
+                    ${showDelete ? `
+                        <div style="margin-top: 20px; text-align: right;">
+                            <button class="btn" onclick="deleteStudent('${student.rollNo}')" 
+                                    style="background: linear-gradient(135deg, #ff6b6b, #ee5a52); font-size: 0.95rem; padding: 10px 20px;">
+                                🗑️ Delete
+                            </button>
+                        </div>
+                    ` : ''}
+                </div>
+            `;
+        }
+
+        function deleteStudent(rollNo) {
+            if (confirm(`Are you sure you want to delete student with Roll No: ${rollNo}?`)) {
+                const result = university.deleteStudent(rollNo);
+                showAlert(result.message, result.success ? 'success' : 'error');
+                if (result.success) {
+                    showAllStudents(); // Refresh the list
+                }
+            }
+        }
+
+        // Initialize with welcome screen
+        document.addEventListener('DOMContentLoaded', function() {
+            university.updateStats();
+        });
+    </script>
+</body>
+</html>
